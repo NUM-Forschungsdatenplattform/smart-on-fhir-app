@@ -39,17 +39,6 @@
             :mode="conditionEditorState.mode"
             :allergyId="conditionEditorState.allergyId"
             :name="conditionEditorState.allergyData.name"/>
-        <allergy-editor
-            v-if="allergyEditorState.visible"
-            v-on:new-allergy="addAllergyToAllergies"
-            v-on:cancel-new-allergy="cancelNewAllergy"
-            v-on:update-allergy="updateAllergyInAllergyList"
-            v-on:cancel-edit-allergy="cancelEditAllergy"
-            :mode="allergyEditorState.mode"
-            :allergyId="allergyEditorState.allergyId"
-            :name="allergyEditorState.allergyData.name"
-            :substance="allergyEditorState.allergyData.substance"
-            :manifestation="allergyEditorState.allergyData.manifest"/>
       </v-col>
     </v-row>
   </v-container>

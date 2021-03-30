@@ -14,15 +14,6 @@ export default {
     props: ['tstprop','oaToken', 'oaPatient'],
     data: function() {
         return {
-            allergyEditorState: {
-                visible:false,
-                mode:'new',
-                allergyId: -1,
-                allergyData: {
-                    name: '',
-                    substance: '',
-                    manifest: ''
-                }},
             conditionEditorState: {
                 visible:false,
                 mode:'new',
@@ -32,11 +23,8 @@ export default {
                     substance: '',
                     manifest: ''
                 }},
-            allergyListEnabled:true,
             conditionListEnabled:true,
-            selectedAllergy: -1,
             selectedCondition: -1,
-            allergies: [],
             conditions: [],
             patientInfo:{id: '', givenName: '', familyName: '', identifier: {}}
         }
@@ -51,19 +39,7 @@ export default {
         conditionTemplate: function(){
             return JSON.parse(ConditionTemplate);
         },
-        allergyKeyValueList: function (){//project selected allergy to key-value set
-            let nvp = function(n,v){return {name:n,value:v}};
-            if(this.selectedAllergy >= 0){
-                return [
-                    nvp('Name',this.allergies[this.selectedAllergy].name),
-                    // nvp('Date of onset', '6/5/2002'),
-                    // nvp('Substance', 'Nuts'),
-                    // nvp('Reaction', 'Rash, difficulty in breathing')
-                ];
-            }
-            else return [];
-        },
-        conditionKeyValueList: function (){//project selected allergy to key-value set
+        conditionKeyValueList: function (){//project selected condition to key-value set
             let nvp = function(n,v){return {name:n,value:v}};
             if(this.selectedCondition >= 0){
                 return [
@@ -74,36 +50,15 @@ export default {
         }
     },
     methods: {
-        disableAllergyList(){
-            this.selectedAllergy = -1;
-            this.allergyListEnabled = false;
-        },
         disableConditionList(){
             this.selectedCondition = -1;
             this.conditionListEnabled = false;
-        },
-        displayAddNewAllergy(){
-            this.disableAllergyList();
-            this.allergyEditorState.mode = 'new';
-            this.allergyEditorState.allergyId = this.allergies.length + 1;
-            this.allergyEditorState.visible = true;
         }
         ,displayAddNewCondition(){
             this.disableConditionList();
             this.conditionEditorState.mode = 'new';
             this.conditionEditorState.allergyId = this.allergies.length + 1;
             this.conditionEditorState.visible = true;
-        },
-        startEditAllergy(docId){
-            let idx = this.findAllergyIndex(docId);
-            let alg = this.allergies[idx];
-
-            this.disableAllergyList();
-
-            this.allergyEditorState.mode = 'update';
-            this.allergyEditorState.allergyId = alg.id;
-            this.allergyEditorState.allergyData.name = alg.name;
-            this.allergyEditorState.visible = true;
         },
         startEditCondition(docId){
             let idx = this.findConditionIndex(docId);
@@ -116,18 +71,9 @@ export default {
             this.conditionEditorState.allergyData.name = alg.name;
             this.conditionEditorState.visible = true;
         },
-        cancelNewAllergy(){
-            this.resetAllergyEditorState();
-            this.allergyListEnabled = true;
-        },
         cancelNewCondition(){
             this.resetConditionEditorState();
             this.conditionListEnabled = true;
-        },
-        cancelEditAllergy(){
-            this.selectedAllergy = this.findAllergyIndex(this.allergyEditorState.allergyId);
-            this.resetAllergyEditorState();
-            this.allergyListEnabled = true;
         },
         cancelEditCondition(){
             this.selectedCondition = this.findConditionIndex(this.conditionEditorState.allergyId);
@@ -150,25 +96,6 @@ export default {
                 // .then(function(response){
                 //     console.log("CREATE RESOURCE RESPONSE: " + response)});
         },
-        addAllergyToAllergies(allergy){
-            // let handler = this.addActualAllergy;
-            axios
-                .post("http://localhost:8081/allergies" + this.oaPatient,
-                    {name: allergy.name},
-                    {'headers':{'Authorization':'Bearer ' + this.oaToken}})
-                // .then(function(response){handler(response.data)});
-                .then(function(response){
-                    console.log("CREATE RESOURCE RESPONSE: " + response)});
-        },
-        addActualAllergy(savedAlg){
-            this.allergies.push({id:savedAlg.id, name: savedAlg.name});
-
-            this.allergyListEnabled = true;
-            this.resetAllergyEditorState();
-            //select newly added allergy
-            let idx = this.findAllergyIndex(savedAlg.id);
-            this.selectedAllergy = idx;
-        },
         addActualCondition(savedCondition){
             this.conditions.push({id:savedCondition.id, name: savedCondition.name});
 
@@ -177,19 +104,6 @@ export default {
             //select newly added allergy
             let idx = this.findConditionIndex(savedCondition.id);
             this.selectedCondition = idx;
-        },
-        updateAllergyInAllergyList(allergy){
-            let idx = this.findAllergyIndex(this.allergyEditorState.allergyId);//TODO: why don't I have the id in allergy obj?
-            let alg = this.allergies[idx];
-            let handle = function(response){
-                alg.name = response.data.name;
-                this.allergyListEnabled = true;
-                this.resetAllergyEditorState();
-                this.selectedAllergy = idx;
-            }.bind(this);
-            axios
-                .put("http://localhost:8081/allergies/" + alg.id, {name:allergy.name})
-                .then(handle)
         },
         updateConditionInConditionList(condition){
             let idx = this.findConditionIndex(this.conditionEditorState.allergyId);//TODO: why don't I have the id in allergy obj?
@@ -204,44 +118,9 @@ export default {
                 .put("http://localhost:8081/allergies/" + alg.id, {name:condition.name})
                 .then(handle)
         },
-        handleClinicalDocSelect(id){
-            let idx = this.findAllergyIndex(id);
-            this.selectedAllergy = idx;
-        },
         handleConditionSelect(id){
             let idx = this.findConditionIndex(id);
             this.selectedCondition = idx;
-        },
-        handleDelete(id){
-            let idx = this.findAllergyIndex(id);
-            let currAlgId =
-                this.selectedAllergy >= 0
-                    ?  this.allergies[this.selectedAllergy].id
-                    : -1;
-            if (idx === this.selectedAllergy){
-                this.selectedAllergy = -1;//deleted the allergy on display
-            }
-            let handle = function(){
-                //TODO: this is for updating arr element in place w/o modifying arr
-                //let newVal = 'Allergy 1' + this.allergies[0].name;
-                //this.$set(this.allergies,0, {id:1, name: newVal});
-                this.$set(this.allergies, this.allergies.splice(idx, 1));
-
-                //selected alg may not be valid, array changed,
-                // selectedAllergy will point at wrong index if we deleted item < selected index
-                if(this.selectedAllergy !== -1){//didn't delete selected one, let's update index
-                    this.selectedAllergy = this.findAllergyIndex(currAlgId);
-                }
-            }.bind(this);
-            axios
-                .delete("http://localhost:8081/allergies/" + id)
-                .then(function(response){
-                    if(response.status === 200){
-                        handle()
-                    }});
-        },
-        findAllergyIndex(id){
-            return this.allergies.findIndex(function(alg){return alg.id === id});
         },
         findConditionIndex(id){
             return this.conditions.findIndex(function(cond){return cond.id === id});
@@ -319,14 +198,6 @@ export default {
             this.conditionEditorState.allergyData.name = '';
             this.conditionEditorState.allergyData.substance = '';
             this.conditionEditorState.allergyData.manifest = '';
-        },
-        resetAllergyEditorState(){
-            this.allergyEditorState.visible = false;
-            this.allergyEditorState.allergyId = -1;
-            this.allergyEditorState.allergyData.id = -1;//TODO: can I get away with null'ing allergyData?
-            this.allergyEditorState.allergyData.name = '';
-            this.allergyEditorState.allergyData.substance = '';
-            this.allergyEditorState.allergyData.manifest = '';
         }
     },
     mounted() {
