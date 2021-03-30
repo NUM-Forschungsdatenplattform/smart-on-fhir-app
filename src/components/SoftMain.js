@@ -4,7 +4,6 @@
 import {DataStore} from "@/js/Util";
 import AllergyList from "@/components/AllergyList"
 import KeyValueCard from "@/components/KeyValueCard"
-import AllergyEditor from "@/components/AllergyEditor"
 import TsPanel from "@/components/ts-panel/TsPanel.vue"//must use .vue or it'll attempt to import js file
 import axios from "axios";
 import ConditionList from "@/components/ConditionList";
@@ -47,7 +46,6 @@ export default {
         'allergy-list': AllergyList,
         'condition-list': ConditionList,
         'key-val-card': KeyValueCard,
-        'allergy-editor': AllergyEditor,
         'condition-editor': ConditionEditor,
         'ts-panel': TsPanel
     },
