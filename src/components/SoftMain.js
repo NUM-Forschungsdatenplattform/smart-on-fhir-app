@@ -2,7 +2,6 @@
 //see webpack.config.js under dev4
 //https://stackoverflow.com/questions/42749973/es6-import-using-at-sign-in-path-in-a-vue-js-project-using-webpack
 import {DataStore} from "@/js/Util";
-import AllergyList from "@/components/AllergyList"
 import KeyValueCard from "@/components/KeyValueCard"
 import TsPanel from "@/components/ts-panel/TsPanel.vue"//must use .vue or it'll attempt to import js file
 import axios from "axios";
@@ -43,7 +42,6 @@ export default {
         }
     },
     components: {
-        'allergy-list': AllergyList,
         'condition-list': ConditionList,
         'key-val-card': KeyValueCard,
         'condition-editor': ConditionEditor,
