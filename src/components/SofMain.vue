@@ -29,7 +29,6 @@
       </v-col>
       <v-col cols="7">
         <key-val-card v-if="selectedCondition >= 0" :key-values="conditionKeyValueList"/>
-        <key-val-card v-if="selectedAllergy >= 0" :key-values="allergyKeyValueList"/>
         <condition-editor
             v-if="conditionEditorState.visible"
             v-on:new-condition="addConditionToConditions"

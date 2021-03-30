@@ -122,6 +122,10 @@ export default {
             let idx = this.findConditionIndex(id);
             this.selectedCondition = idx;
         },
+        handleDelete(id){
+            //TODO:IMPLEMENT
+            console.log(id);
+        },
         findConditionIndex(id){
             return this.conditions.findIndex(function(cond){return cond.id === id});
         },
@@ -207,25 +211,5 @@ export default {
             this.getPatientResource();
             this.getConditions();
         })
-
-
-        // let allergies = this.allergies;
-        // axios
-        //     .get("http://localhost:8081/allergies")
-        //     .then(function(response){
-        //         let algs = response.data;
-        //         if (algs.length > 0) {
-        //             algs.forEach(function(alg){allergies.push({id:alg.id, name:alg.name})} );
-        //         }
-        //     })
-        //     .catch(function (err) { //TODO: https://stackoverflow.com/questions/47067929/how-to-handle-neterr-connection-refused-in-axios-vue-js
-        //         //you cannot stop errors going to the console
-        //         //https://stackoverflow.com/questions/51978983/how-to-remove-the-console-errors-in-axios
-        //         //https://stackoverflow.com/questions/16372271/jquery-ajax-how-to-prevent-404-errors-spam-in-chrome-devtools/16379746#16379746
-        //         if(!err.response){
-        //             console.log('network error occured')
-        //         }else
-        //             console.log(err);
-        //     });
     }
 }
