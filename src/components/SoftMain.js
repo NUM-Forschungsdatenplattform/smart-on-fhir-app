@@ -57,7 +57,7 @@ export default {
         ,displayAddNewCondition(){
             this.disableConditionList();
             this.conditionEditorState.mode = 'new';
-            this.conditionEditorState.allergyId = this.allergies.length + 1;
+            this.conditionEditorState.allergyId = this.conditions.length + 1;
             this.conditionEditorState.visible = true;
         },
         startEditCondition(docId){
