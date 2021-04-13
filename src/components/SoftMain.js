@@ -186,7 +186,7 @@ export default {
                     {'headers':{'Authorization':'Bearer ' + this.oaToken}})
                 .then(function(response){
                     let conditionBundle = response.data;
-                    if (conditionBundle.entry.length > 0) {
+                    if (conditionBundle.total > 0) {
                         conditionBundle
                             .entry
                             .forEach(function(cond){
