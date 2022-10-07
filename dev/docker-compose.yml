@@ -1,0 +1,69 @@
+version: "3"
+
+services:
+  postgresql:
+    image: bitnami/postgresql:11.17.0
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      POSTGRESQL_USERNAME: bn_keycloak
+      POSTGRESQL_DATABASE: bitnami_keycloak
+
+  keycloak:
+    depends_on:
+      - postgresql
+    image: bitnami/keycloak:19.0.3
+    environment:
+      KEYCLOAK_ADMIN_USER: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8088:8080"
+
+  ehrdb:
+    image: ehrbase/ehrbase-postgres:13.4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      EHRBASE_USER: ehrbase
+      EHRBASE_PASSWORD: ehrbase123
+
+  ehrbase:
+    depends_on:
+      - ehrdb
+    image: ehrbase/ehrbase:0.21.1
+    environment:
+      DB_URL: jdbc:postgresql://ehrdb:5432/ehrbase
+      DB_USER: ehrbase
+      DB_PASS: ehrbase123
+      AUTH_TYPE: BASIC
+      AUTH_USER: fhir_bridge
+      AUTH_PASSWORD: fhir_bridge123
+      SYSTEM_NAME: local.ehrbase.org
+
+  fhirdb:
+    image: bitnami/postgresql:14.5.0
+    environment:
+      POSTGRES_USERNAME: fhir_bridge
+      POSTGRES_PASSWORD: fhir_bridge123
+      POSTGRESQL_DATABASE: fhir_bridge
+
+  fhir-bridge:
+    depends_on:
+      - keycloak
+      - ehrbase
+      - fhirdb
+    image: ehrbase/fhir-bridge:1.5.5
+    environment:
+      FHIRBRIDGE_OPENEHR_URL: http://ehrbase:8080/ehrbase/
+      FHIRBRIDGE_OPENEHR_SECURITY_USER_NAME: fhir_bridge
+      FHIRBRIDGE_OPENEHR_SECURITY_USER_PASSWORD: fhir_bridge123
+      SPRING_DATASOURCE_URL: jdbc:postgresql://fhirdb:5432/fhir_bridge
+      SPRING_DATASOURCE_USERNAME: fhir_bridge
+      SPRING_DATASOURCE_PASSWORD: fhir_bridge123
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL95Dialect
+    ports:
+      - "8888:8888"
+
+  demographics:
+    image: hapiproject/hapi:v6.1.0
+    ports:
+      - "8082:8080"
