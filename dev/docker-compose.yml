@@ -40,11 +40,10 @@ services:
       SYSTEM_NAME: local.ehrbase.org
 
   fhirdb:
-    image: bitnami/postgresql:14.5.0
+    image: postgres:13.4
     environment:
-      POSTGRES_USERNAME: fhir_bridge
+      POSTGRES_USER: fhir_bridge
       POSTGRES_PASSWORD: fhir_bridge123
-      POSTGRESQL_DATABASE: fhir_bridge
 
   fhir-bridge:
     depends_on:
@@ -63,7 +62,21 @@ services:
     ports:
       - "8888:8888"
 
+  demographicsdb:
+    image: postgres:13.4
+    environment:
+      POSTGRES_USER: demographic
+      POSTGRES_PASSWORD: demographic123
+
   demographics:
-    image: hapiproject/hapi:v6.1.0
+    depends_on:
+      - demographicsdb
+    image: numresearchdataplatform/demographics-service:develop
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://demographicsdb:5432/demographic
+      SPRING_DATASOURCE_USERNAME: demographic
+      SPRING_DATASOURCE_PASSWORD: demographic123
+      KEYCLOAK_URL: http://keycloak:8080
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: http://keycloak:8080/realms/master/protocol/openid-connect/certs
     ports:
       - "8082:8080"
