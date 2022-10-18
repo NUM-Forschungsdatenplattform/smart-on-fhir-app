@@ -18,7 +18,7 @@ Run the following command from the project root:
 When all services finish initializing successfully, you should have all you need running on the default endpoints:
 - Keycloak on http://localhost:8088/
 - FHIR Bridge on http://localhost:8888/fhir-bridge/fhir
-- FHIR Server (using HAPI FHIR JPA Server Starter) on http://localhost:8082/fhir
+- Demographics Service on http://localhost:8082/fhir
 
 **NOTE**: The Keycloak instance does not have the required configuration to immediately run this app. You will to do that manually for now.
 
